@@ -5,6 +5,18 @@
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="gradleHome" value="" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/common" />
+            <option value="$PROJECT_DIR$/common/auth-common" />
+            <option value="$PROJECT_DIR$/services" />
+            <option value="$PROJECT_DIR$/services/order-service" />
+            <option value="$PROJECT_DIR$/services/payment-service" />
+            <option value="$PROJECT_DIR$/services/user-service" />
+            <option value="$PROJECT_DIR$/services/vendor-service" />
+          </set>
+        </option>
       </GradleProjectSettings>
     </option>
   </component>
