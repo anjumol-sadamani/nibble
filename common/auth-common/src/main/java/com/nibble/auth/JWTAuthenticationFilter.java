@@ -26,20 +26,20 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String authHeader = request.getHeader("Authorization");
+        final String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
         try {
-            String token = authHeader.substring(7);
-            AuthenticatedUser user = JWTUtil.validateToken(token, secretKey);
+            final String token = authHeader.substring(7);
+            final AuthenticatedUser user = JWTUtil.validateToken(token, secretKey);
 
-            SecurityContext context = SecurityContextHolder.createEmptyContext();
-            List<GrantedAuthority> authorities = user.permissions().stream()
+            final SecurityContext context = SecurityContextHolder.createEmptyContext();
+            final List<GrantedAuthority> authorities = user.permissions().stream()
                     .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toList());
-            Authentication authToken =
+            final Authentication authToken =
                     new UsernamePasswordAuthenticationToken(user, null, authorities);
             context.setAuthentication(authToken);
             SecurityContextHolder.setContext(context);
