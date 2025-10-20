@@ -22,14 +22,7 @@ public class UserLoginController {
 
         String email = user.getEmail();
         String username = user.getGivenName();
-        String message;
-        if (userService.isExistingUser(email, username)) {
-            message = "Welcome back, " + username + "!";
-        } else {
-            userService.saveOrUpdateUser(email, username);
-            message = "Welcome to Nibble, " + username + "!";
-        }
-        return ResponseEntity.ok(message);
+        return ResponseEntity.ok(userService.saveOrUpdate(email, username));
     }
 
 }
