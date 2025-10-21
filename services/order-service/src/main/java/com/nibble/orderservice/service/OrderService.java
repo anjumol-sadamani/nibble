@@ -16,24 +16,24 @@ import java.util.List;
 public class OrderService {
 
     private final OrderRepository orderRepo;
+    private final VendorClient vendorClient;
 
     public Order createOrder(OrderDto orderDto){
-       boolean isValidOrder = validateOrder(orderDto);
+       final boolean isValidOrder = validateOrder(orderDto);
        if(!isValidOrder) throw new IllegalArgumentException("order is not valid");
 
-       BigDecimal totalPrice = calculateTotal(orderDto);
+       final BigDecimal totalPrice = calculateTotal(orderDto);
 
 
-       List<OrderItem> orderItems = orderDto.items()
+       final List<OrderItem> orderItems = orderDto.items()
                .stream()
                .map(itemDto ->
                        new OrderItem(itemDto.itemName(),itemDto.quantity(),itemDto.price()))
                .toList();
 
-        Order order = new Order(
+        final Order order = new Order(
                 totalPrice, OrderStatus.PENDING, orderDto.customerId(), orderDto.vendorId());
         order.addOrderItems(orderItems);
-
 
        return orderRepo.save(order);
     }
@@ -47,7 +47,7 @@ public class OrderService {
 
     private boolean validateOrder(OrderDto orderDto) {
         //check if items stock is still available by calling vendor service
-        return true;
+        return vendorClient.checkStockAvailability(orderDto.vendorId(), orderDto.items() );
     }
 
 
