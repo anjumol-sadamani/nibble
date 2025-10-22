@@ -5,7 +5,9 @@ import com.nibble.orderservice.entity.Order;
 import com.nibble.orderservice.entity.OrderItem;
 import com.nibble.orderservice.enums.OrderStatus;
 import com.nibble.orderservice.repository.OrderRepository;
+import com.nibble.orderservice.service.event.OrderEventPublisher;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -13,10 +15,12 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrderService {
 
     private final OrderRepository orderRepo;
     private final VendorClient vendorClient;
+    private final OrderEventPublisher orderEventPublisher;
 
     public Order createOrder(OrderDto orderDto){
        final boolean isValidOrder = validateOrder(orderDto);
@@ -34,8 +38,11 @@ public class OrderService {
         final Order order = new Order(
                 totalPrice, OrderStatus.PENDING, orderDto.customerId(), orderDto.vendorId());
         order.addOrderItems(orderItems);
+        Order savedOrder = orderRepo.save(order);
+        log.info("Successfully saved order with ID: {}", savedOrder.getId());
 
-       return orderRepo.save(order);
+        orderEventPublisher.publishOrderCreatedEvent(savedOrder);
+        return savedOrder;
     }
 
     private BigDecimal calculateTotal(OrderDto orderDto) {
