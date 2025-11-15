@@ -1,5 +1,6 @@
 package com.nibble.orderservice.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.nibble.orderservice.dto.OrderDto;
 import com.nibble.orderservice.entity.Order;
 import com.nibble.orderservice.service.OrderService;
@@ -18,7 +19,7 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/order")
-    public ResponseEntity<Order> createOrder(@RequestBody OrderDto orderDto){
+    public ResponseEntity<Order> createOrder(@RequestBody OrderDto orderDto) throws JsonProcessingException {
        Order order = orderService.createOrder(orderDto);
        return ResponseEntity.ok(order);
     }

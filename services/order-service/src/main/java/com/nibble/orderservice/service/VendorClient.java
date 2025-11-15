@@ -12,10 +12,10 @@ public class VendorClient {
 
     @CircuitBreaker(name = "vendorService", fallbackMethod = "checkStockAvailabilityFallback")
     public boolean checkStockAvailability(Long vendorId, List<ItemDto> items){
-        if (Math.random() > 0.5) {
-            System.out.println("Vendor service failed!");
-            throw new RuntimeException("Vendor service is down!");
-        }
+//        if (Math.random() > 0.5) {
+//            System.out.println("Vendor service failed!");
+//            throw new RuntimeException("Vendor service is down!");
+//        }
         System.out.println("Vendor service responded successfully");
         return true;
     }
