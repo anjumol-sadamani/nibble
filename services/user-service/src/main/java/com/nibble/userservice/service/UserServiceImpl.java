@@ -16,23 +16,13 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public String saveOrUpdate(String email, String username) {
-        String message;
-        if (isExistingUser(email, username)) {
-            message = "Welcome back, " + username + "!";
-        } else {
-            save(email, username);
-            message = "Welcome to Nibble, " + username + "!";
-        }
-        return message;
-    }
-
-    private void save(String email, String username) {
+    public void save(String email, String username) {
         final User newUser = new User(email, username);
         userRepository.save(newUser);
     }
 
-    private boolean isExistingUser(String email, String username) {
+    @Override
+    public boolean isExistingUser(String email, String username) {
         final Optional<User> existingUser = userRepository.findByEmail(email);
         return existingUser.isPresent();
     }
