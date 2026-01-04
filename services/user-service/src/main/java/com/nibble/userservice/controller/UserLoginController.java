@@ -1,5 +1,6 @@
 package com.nibble.userservice.controller;
 
+import com.nibble.userservice.dto.LoginResponse;
 import com.nibble.userservice.service.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,20 +18,14 @@ public class UserLoginController {
     private final UserServiceImpl userService;
 
     @GetMapping("/")
-    public ResponseEntity<String> home(@AuthenticationPrincipal OidcUser user) {
+    public ResponseEntity<LoginResponse> home(@AuthenticationPrincipal OidcUser user) {
         log.info("User authenticated: {}", user.getEmail());
 
         String email = user.getEmail();
         String username = user.getGivenName();
-        String message;
-        if (userService.isExistingUser(email, username)) {
-            message = "Welcome back, " + username + "!";
-        } else {
-            userService.save(email, username);
-            message = "Welcome to Nibble, " + username + "!";
-        }
-
-        return ResponseEntity.ok(message);
+        
+        LoginResponse loginResponse = userService.generateLoginResponse(email, username);
+        return ResponseEntity.ok(loginResponse);
     }
 
 }
