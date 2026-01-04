@@ -7,12 +7,36 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
 import javax.crypto.SecretKey;
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 
-public  class JWTUtil {
+public class JwtService {
 
-    public static AuthenticatedUser validateToken(String token, String secretKey){
+    private final String secretKey;
+    private final long expirationMs;
 
+    public JwtService(String secretKey, long expirationMs) {
+        this.secretKey = secretKey;
+        this.expirationMs = expirationMs;
+    }
+
+    public String generateToken(TokenRequest request) {
+        final SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
+        final long now = Instant.now().toEpochMilli();
+        
+        return Jwts.builder()
+                .claim(JWTClaims.USER_ID, request.userId())
+                .claim(JWTClaims.EMAIL, request.email())
+                .claim(JWTClaims.ROLE, request.role())
+                .claim(JWTClaims.PERMISSIONS, request.permissions())
+                .issuedAt(new Date(now))
+                .expiration(new Date(now + expirationMs))
+                .signWith(key)
+                .compact();
+    }
+
+    public AuthenticatedUser validateToken(String token) {
         final SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
         final Jws<Claims> claimsJws = Jwts.parser()
                 .verifyWith(key)
@@ -29,7 +53,7 @@ public  class JWTUtil {
        return new AuthenticatedUser(userId,email,role,permissions);
     }
 
-    private static String getRequiredClaim(Claims claims, String claimName) {
+    private String getRequiredClaim(Claims claims, String claimName) {
         final String value = claims.get(claimName, String.class);
         if(value == null){
             throw new IllegalArgumentException("Missing required claim: " + claimName);
@@ -37,7 +61,7 @@ public  class JWTUtil {
         return value;
     }
 
-    private static List<String> getRequiredListClaim(Claims claims, String claimName) {
+    private List<String> getRequiredListClaim(Claims claims, String claimName) {
         final List<String> value = (List<String>) claims.get(claimName);
         if(value == null){
             throw new IllegalArgumentException("Missing required claim: " + claimName);

@@ -18,10 +18,10 @@ import java.util.stream.Collectors;
 
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
-    private final String secretKey;
+    private final JwtService jwtService;
 
     public JWTAuthenticationFilter(String secretKey) {
-        this.secretKey = secretKey;
+        this.jwtService = new JwtService(secretKey, 86400000L);
     }
 
     @Override
@@ -33,7 +33,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         }
         try {
             final String token = authHeader.substring(7);
-            final AuthenticatedUser user = JWTUtil.validateToken(token, secretKey);
+            final AuthenticatedUser user = jwtService.validateToken(token);
 
             final SecurityContext context = SecurityContextHolder.createEmptyContext();
             final List<GrantedAuthority> authorities = user.permissions().stream()
